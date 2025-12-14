@@ -1,3 +1,13 @@
+È normale che accada questo. Ti spiego brevemente il perché e come risolverlo.
+Il sito è ospitato su GitHub Pages, che è un sistema statico. Significa che ogni volta che ricarichi la pagina, il browser scarica di nuovo il codice originale dal server (dove i voti sono quelli iniziali). Le modifiche che fai tramite il pannello avvengono solo "nella memoria" del tuo browser in quel momento.
+Per risolvere, ho due strade. Scegli quella che fa per te:
+ * SOLUZIONE "LOCALE" (Codice qui sotto): Modifico il codice affinché salvi i dati nella memoria del tuo telefono/PC (LocalStorage).
+   * Vantaggio: Se chiudi e riapri la pagina sul tuo telefono, i voti rimangono aggiornati.
+   * Svantaggio: Se invii il link a un amico, lui vedrà i voti originali, non i tuoi aggiornamenti (perché i dati sono salvati solo sul tuo dispositivo).
+ * SOLUZIONE "PUBBLICA" (Per farli vedere a tutti): Se vuoi che tutti vedano i nuovi voti, devi modificare i numeri direttamente nel file index.html su GitHub (dove c'è scritto votes: 30, ecc.) e fare "Commit changes".
+Ecco il codice aggiornato con la SOLUZIONE 1 (Salvataggio Locale).
+Ora, quando cambi i voti, il sito se li ricorderà sul tuo dispositivo anche se aggiorni la pagina.
+Copia e incolla tutto nel tuo file index.html:
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -63,6 +73,12 @@
         button.update-btn {
             background: #000; color: white; border: none; padding: 12px 30px;
             font-size: 15px; border-radius: 8px; cursor: pointer; font-weight: bold;
+            margin: 0 5px;
+        }
+        button.reset-btn {
+            background: #cc0000; color: white; border: none; padding: 12px 30px;
+            font-size: 15px; border-radius: 8px; cursor: pointer; font-weight: bold;
+            margin: 0 5px;
         }
 
         /* PODIO */
@@ -104,7 +120,7 @@
         .rank-icon-3 { color: #b08d55; font-size: 22px; }
         
         .row-img { width: 55px; height: 55px; border-radius: 12px; object-fit: cover; margin-right: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); flex-shrink: 0; }
-        .row-info { flex: 1; min-width: 0; } /* min-width 0 fixes flex ellipsis issues */
+        .row-info { flex: 1; min-width: 0; }
         .row-name { font-weight: 700; color: #000; font-size: 15px; display: block; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .row-id { font-size: 12px; color: #888; font-family: monospace; }
         
@@ -121,34 +137,25 @@
         
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- STILI MOBILE (Responsive) --- */
+        /* --- STILI MOBILE --- */
         @media (max-width: 600px) {
             .dashboard { margin: 0; border-radius: 0; min-height: 100vh; }
-            
-            /* Header compatto */
             header { padding: 10px 15px; gap: 10px; }
-            .logo { height: 40px; } /* Loghi più piccoli */
+            .logo { height: 40px; }
             header h1 { font-size: 18px; line-height: 1.2; }
-
-            /* Podio adattabile */
             .podium-section { height: auto; padding: 30px 10px 20px 10px; gap: 8px; align-items: flex-end; }
             .podium-card { padding: 6px; width: 32%; }
-            .podium-card img { height: 80px; margin-bottom: 5px; } /* Immagini podio ridotte */
-            .podium-card div { font-size: 12px; } /* Testo più piccolo */
-            
+            .podium-card img { height: 80px; margin-bottom: 5px; }
+            .podium-card div { font-size: 12px; }
             .winner { height: 180px; }
             .second, .third { height: 150px; }
             .badge { width: 28px; height: 28px; line-height: 28px; font-size: 14px; top: -10px; }
-
-            /* Lista ottimizzata */
             .list-section { padding: 15px; }
             .row { padding: 10px; }
             .row-img { width: 45px; height: 45px; margin-right: 10px; }
             .row-votes { width: 80px; }
             .vote-count { font-size: 13px; }
             .row-name { font-size: 14px; }
-            
-            /* Modale Mobile */
             .modal-content { width: 95%; padding: 15px; }
         }
     </style>
@@ -164,7 +171,7 @@
 
     <div class="controls-area">
         <button class="toggle-btn" onclick="toggleAdminPanel()">
-            <span>⚙️</span> Impostazioni
+            <span>⚙️</span> Modifica Voti
         </button>
     </div>
 
@@ -172,8 +179,12 @@
         <div class="inputs-grid" id="input-container">
             </div>
         <div style="text-align: center;">
-            <button class="update-btn" onclick="updateAndRender()">Aggiorna Classifica</button>
+            <button class="update-btn" onclick="saveAndRender()">Salva & Aggiorna</button>
+            <button class="reset-btn" onclick="resetVotes()">Reset Default</button>
         </div>
+        <p style="text-align:center; font-size:12px; color:#666; margin-top:10px;">
+            ⚠️ Nota: I dati vengono salvati solo su questo dispositivo.
+        </p>
     </div>
     
     <div class="podium-section" id="podium-container"></div>
@@ -194,8 +205,8 @@
 </div>
 
 <script>
-    // --- DATI ---
-    let photos = [
+    // --- DATI ORIGINALI ---
+    const defaultPhotos = [
         { id: "Foto 1", src: "foto1.jpg", votes: 30 },
         { id: "Foto 2", src: "foto2.jpg", votes: 12 },
         { id: "Foto 3", src: "foto3.jpg", votes: 15 },
@@ -203,10 +214,49 @@
         { id: "Foto 5", src: "foto5.jpg", votes: 19 }
     ];
 
+    let photos = [];
+
+    // --- CARICAMENTO ---
     window.onload = function() {
+        loadData();
         generateInputs();
-        updateAndRender();
+        renderAll();
     };
+
+    // Funzione per caricare i dati dal LocalStorage o usare quelli di default
+    function loadData() {
+        const savedData = localStorage.getItem('challengeVotes_2ppl');
+        if (savedData) {
+            photos = JSON.parse(savedData);
+        } else {
+            // Copia profonda dell'array di default
+            photos = JSON.parse(JSON.stringify(defaultPhotos));
+        }
+    }
+
+    // Funzione per salvare e aggiornare
+    function saveAndRender() {
+        photos.forEach((p, index) => {
+            const inputVal = document.getElementById(`vote-${index}`).value;
+            p.votes = inputVal === "" ? 0 : parseInt(inputVal);
+        });
+        
+        // Salva nel browser
+        localStorage.setItem('challengeVotes_2ppl', JSON.stringify(photos));
+        
+        renderAll();
+        alert("Voti salvati su questo dispositivo!");
+    }
+
+    // Funzione per resettare ai valori originali
+    function resetVotes() {
+        if(confirm("Vuoi ripristinare i voti originali?")) {
+            localStorage.removeItem('challengeVotes_2ppl');
+            photos = JSON.parse(JSON.stringify(defaultPhotos));
+            generateInputs();
+            renderAll();
+        }
+    }
 
     function toggleAdminPanel() {
         const panel = document.getElementById('adminPanel');
@@ -233,12 +283,8 @@
         });
     }
 
-    function updateAndRender() {
-        photos.forEach((p, index) => {
-            const inputVal = document.getElementById(`vote-${index}`).value;
-            p.votes = inputVal === "" ? 0 : parseInt(inputVal);
-        });
-
+    function renderAll() {
+        // Ordina per voti
         const sortedData = [...photos].sort((a, b) => b.votes - a.votes);
         const maxVotes = sortedData[0].votes > 0 ? sortedData[0].votes : 1;
 
@@ -277,7 +323,6 @@
             const rank = index + 1;
             const widthPct = (item.votes / maxVotes) * 100;
             
-            // Icone Rank
             let rankDisplay = `<span style="color:#888;">${rank}</span>`;
             if(rank === 1) rankDisplay = `<span class="rank-icon-1">🥇</span>`;
             if(rank === 2) rankDisplay = `<span class="rank-icon-2">🥈</span>`;
@@ -314,3 +359,4 @@
 
 </body>
 </html>
+
