@@ -2,13 +2,14 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Classifica Challenge</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dashboard 2PPL XMAS CHALLENGE</title>
     <style>
-        body { font-family: 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f0f4f8; margin: 0; padding: 0; color: #1c1e21; }
+        /* --- STILI BASE (Desktop) --- */
+        body { font-family: 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f0f4f8; margin: 0; padding: 0; color: #1c1e21; -webkit-font-smoothing: antialiased; }
         .dashboard { max-width: 900px; margin: 30px auto; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); overflow: hidden; }
         
-        /* --- HEADER AGGIORNATO CON LOGHI --- */
+        /* HEADER */
         header { 
             background-color: #ffffff; 
             padding: 15px 40px; 
@@ -24,21 +25,23 @@
             text-transform: uppercase; 
             letter-spacing: 1px; 
             color: #000;
+            text-align: center;
+            line-height: 1.1;
         }
-        .logo { height: 70px; width: auto; object-fit: contain; }
+        .logo { height: 70px; width: auto; object-fit: contain; max-width: 100px; }
         
-        /* --- CONTROLLI --- */
+        /* CONTROLLI */
         .controls-area { text-align: center; padding: 15px; background: #fafafa; border-bottom: 1px solid #eee; }
         .toggle-btn {
             background: #ffffff; border: 1px solid #e0e0e0; color: #333;
             padding: 8px 20px; border-radius: 20px; font-size: 14px; font-weight: 600;
             cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            -webkit-tap-highlight-color: transparent;
         }
-        .toggle-btn:hover { background: #f7f7f7; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.08); }
         .toggle-btn.active { background: #333; color: #fff; border-color: #333; }
         
-        /* --- PANNELLO ADMIN --- */
+        /* PANNELLO ADMIN */
         .admin-panel {
             max-height: 0; opacity: 0; overflow: hidden;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -47,90 +50,107 @@
         .admin-panel.open { max-height: 500px; opacity: 1; padding: 25px; }
 
         .inputs-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-bottom: 20px; }
-        
         .input-card {
-            background: white; padding: 15px; border-radius: 12px;
+            background: white; padding: 10px; border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid #f0f0f0;
-            display: flex; flex-direction: column; align-items: center; width: 90px;
+            display: flex; flex-direction: column; align-items: center; width: 80px;
         }
-        .input-card label { font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #666; }
+        .input-card label { font-size: 12px; font-weight: 600; margin-bottom: 5px; color: #666; }
         .input-card input {
-            width: 60px; text-align: center; border: 2px solid #eee;
-            border-radius: 8px; padding: 8px; font-size: 18px; font-weight: bold; color: #333; outline: none;
-            transition: border-color 0.2s;
+            width: 50px; text-align: center; border: 2px solid #eee;
+            border-radius: 8px; padding: 5px; font-size: 16px; font-weight: bold; color: #333; outline: none;
         }
-        .input-card input:focus { border-color: #000; }
-
         button.update-btn {
             background: #000; color: white; border: none; padding: 12px 30px;
             font-size: 15px; border-radius: 8px; cursor: pointer; font-weight: bold;
-            transition: transform 0.2s;
         }
-        button.update-btn:hover { transform: scale(1.05); }
 
-        /* --- PODIO --- */
+        /* PODIO */
         .podium-section { padding: 40px 20px 20px 20px; background: white; display: flex; justify-content: center; align-items: flex-end; gap: 20px; height: 320px; }
         
         .podium-card {
-            background: white; border-radius: 16px; padding: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center; width: 28%;
+            background: white; border-radius: 16px; padding: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center; width: 30%;
             position: relative; transition: transform 0.3s; cursor: pointer;
             display: flex; flex-direction: column; align-items: center; border: 1px solid #fff;
+            -webkit-tap-highlight-color: transparent;
         }
-        .podium-card:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.12); }
-        .podium-card img { width: 100%; height: 140px; object-fit: cover; border-radius: 10px; margin-bottom: 12px; }
+        .podium-card img { width: 100%; height: 140px; object-fit: cover; border-radius: 10px; margin-bottom: 10px; }
         
-        /* Stili specifici per le posizioni */
-        .winner { transform: scale(1.1); border: 3px solid #eebb4d; z-index: 2; height: 260px; justify-content: center; }
-        .winner:hover { transform: scale(1.15); }
-        .second, .third { height: 220px; justify-content: center; border: 1px solid #eee; }
+        .winner { transform: scale(1.1); border: 3px solid #eebb4d; z-index: 2; height: 260px; justify-content: flex-start; }
+        .second, .third { height: 220px; justify-content: flex-start; border: 1px solid #eee; }
         .second { border-top: 4px solid #c0c0c0; }
         .third { border-top: 4px solid #cd7f32; }
 
         .badge {
-            position: absolute; top: -15px; width: 40px; height: 40px; line-height: 40px;
-            border-radius: 50%; color: white; font-weight: 800; font-size: 20px;
+            position: absolute; top: -15px; width: 36px; height: 36px; line-height: 36px;
+            border-radius: 50%; color: white; font-weight: 800; font-size: 18px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2); left: 50%; transform: translateX(-50%);
             display: flex; align-items: center; justify-content: center;
         }
-        /* Colori badge in stile "nastro" */
         .badge-1 { background: #eebb4d; }
-        .badge-1::after { content: ''; position: absolute; bottom: -5px; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 10px solid #eebb4d; z-index: -1; }
-        
         .badge-2 { background: #a8a8a8; }
         .badge-3 { background: #b08d55; }
         
-        /* --- LISTA COMPLETA --- */
+        /* LISTA */
         .list-section { padding: 20px 30px 40px 30px; }
         .section-title { text-align: center; font-size: 20px; font-weight: 700; color: #000; margin-bottom: 25px; margin-top: 10px; }
         
-        .row { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #f5f5f5; transition: background 0.2s; border-radius: 8px; margin-bottom: 8px; background: #fff; }
-        .row:hover { background: #f9f9f9; }
-        .row:last-child { margin-bottom: 0; }
-        .row-rank { font-size: 18px; font-weight: 700; color: #444; width: 40px; text-align: center; }
+        .row { display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #f5f5f5; border-radius: 8px; margin-bottom: 8px; background: #fff; }
+        .row-rank { font-size: 18px; font-weight: 700; color: #444; width: 30px; text-align: center; margin-right: 5px; }
         
-        /* Icone medaglie nella lista */
-        .rank-icon-1 { color: #eebb4d; font-size: 24px; }
-        .rank-icon-2 { color: #a8a8a8; font-size: 24px; }
-        .rank-icon-3 { color: #b08d55; font-size: 24px; }
+        .rank-icon-1 { color: #eebb4d; font-size: 22px; }
+        .rank-icon-2 { color: #a8a8a8; font-size: 22px; }
+        .rank-icon-3 { color: #b08d55; font-size: 22px; }
         
-        .row-img { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; margin: 0 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); cursor: pointer; }
-        .row-info { flex: 1; }
-        .row-name { font-weight: 700; color: #000; font-size: 16px; display: block; margin-bottom: 4px; }
-        .row-id { font-size: 13px; color: #666; font-family: monospace; }
+        .row-img { width: 55px; height: 55px; border-radius: 12px; object-fit: cover; margin-right: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); flex-shrink: 0; }
+        .row-info { flex: 1; min-width: 0; } /* min-width 0 fixes flex ellipsis issues */
+        .row-name { font-weight: 700; color: #000; font-size: 15px; display: block; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .row-id { font-size: 12px; color: #888; font-family: monospace; }
         
-        .row-votes { text-align: right; min-width: 250px; }
-        .vote-count { font-weight: 600; color: #000; margin-bottom: 6px; display: block; }
-        .vote-bar-bg { height: 10px; background: #f0f0f0; border-radius: 5px; overflow: hidden; width: 100%; }
-        .vote-fill { height: 100%; background: #2d81f7; border-radius: 5px; transition: width 0.6s ease-out; }
+        .row-votes { text-align: right; width: 120px; margin-left: 10px; }
+        .vote-count { font-weight: 600; color: #000; font-size: 14px; margin-bottom: 4px; display: block; }
+        .vote-bar-bg { height: 8px; background: #f0f0f0; border-radius: 4px; overflow: hidden; width: 100%; }
+        .vote-fill { height: 100%; background: #2d81f7; border-radius: 4px; transition: width 0.6s ease-out; }
         
-        /* --- MODALE --- */
-        .modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(255,255,255,0.9); align-items: center; justify-content: center; backdrop-filter: blur(5px); animation: fadeIn 0.2s; }
-        .modal-content { background-color: white; padding: 30px; border-radius: 20px; max-width: 500px; width: 90%; text-align: center; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.15); border: 1px solid #eee; }
-        .close-btn { position: absolute; top: 15px; right: 20px; color: #999; font-size: 30px; cursor: pointer; }
-        .modal-img { max-width: 100%; max-height: 60vh; border-radius: 12px; margin: 20px 0; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        /* MODALE */
+        .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(255,255,255,0.95); align-items: center; justify-content: center; animation: fadeIn 0.2s; }
+        .modal-content { background-color: white; padding: 20px; border-radius: 20px; max-width: 90%; text-align: center; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.2); border: 1px solid #eee; }
+        .close-btn { position: absolute; top: 10px; right: 15px; color: #333; font-size: 30px; cursor: pointer; font-weight: bold; }
+        .modal-img { max-width: 100%; max-height: 60vh; border-radius: 12px; margin: 15px 0; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
         
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- STILI MOBILE (Responsive) --- */
+        @media (max-width: 600px) {
+            .dashboard { margin: 0; border-radius: 0; min-height: 100vh; }
+            
+            /* Header compatto */
+            header { padding: 10px 15px; gap: 10px; }
+            .logo { height: 40px; } /* Loghi più piccoli */
+            header h1 { font-size: 18px; line-height: 1.2; }
+
+            /* Podio adattabile */
+            .podium-section { height: auto; padding: 30px 10px 20px 10px; gap: 8px; align-items: flex-end; }
+            .podium-card { padding: 6px; width: 32%; }
+            .podium-card img { height: 80px; margin-bottom: 5px; } /* Immagini podio ridotte */
+            .podium-card div { font-size: 12px; } /* Testo più piccolo */
+            
+            .winner { height: 180px; }
+            .second, .third { height: 150px; }
+            .badge { width: 28px; height: 28px; line-height: 28px; font-size: 14px; top: -10px; }
+
+            /* Lista ottimizzata */
+            .list-section { padding: 15px; }
+            .row { padding: 10px; }
+            .row-img { width: 45px; height: 45px; margin-right: 10px; }
+            .row-votes { width: 80px; }
+            .vote-count { font-size: 13px; }
+            .row-name { font-size: 14px; }
+            
+            /* Modale Mobile */
+            .modal-content { width: 95%; padding: 15px; }
+        }
     </style>
 </head>
 <body>
@@ -144,7 +164,7 @@
 
     <div class="controls-area">
         <button class="toggle-btn" onclick="toggleAdminPanel()">
-            <span>⚙️</span> Impostazioni
+            <span>⚙️</span> Modifica Voti
         </button>
     </div>
 
@@ -167,9 +187,9 @@
 <div id="modal" class="modal" onclick="closeModal()">
     <div class="modal-content" onclick="event.stopPropagation()">
         <span class="close-btn" onclick="closeModal()">&times;</span>
-        <h2 id="m-title" style="margin: 0; color: #000;"></h2>
+        <h2 id="m-title" style="margin: 0; color: #000; font-size: 18px;"></h2>
         <img id="m-img" class="modal-img" src="">
-        <div id="m-votes" style="font-size: 2em; font-weight: 800; color: #000;"></div>
+        <div id="m-votes" style="font-size: 1.5em; font-weight: 800; color: #000;"></div>
     </div>
 </div>
 
@@ -242,8 +262,8 @@
                     <div class="podium-card ${cssClass}" onclick="openModal('${item.id}', '${item.src}', ${item.votes})">
                         <div class="badge ${badgeClass}">${realRank}</div>
                         <img src="${item.src}" alt="${item.id}" onerror="this.src='https://via.placeholder.com/150?text=IMG'">
-                        <div style="font-weight:800; font-size:18px;">${item.id}</div>
-                        <div style="font-size: 14px; color: #555;">${item.votes} Voti</div>
+                        <div style="font-weight:800; font-size:14px;">${item.id}</div>
+                        <div style="font-size: 12px; color: #555;">${item.votes} Voti</div>
                     </div>
                 `;
             }
@@ -257,7 +277,7 @@
             const rank = index + 1;
             const widthPct = (item.votes / maxVotes) * 100;
             
-            // Icone Rank per i primi 3
+            // Icone Rank
             let rankDisplay = `<span style="color:#888;">${rank}</span>`;
             if(rank === 1) rankDisplay = `<span class="rank-icon-1">🥇</span>`;
             if(rank === 2) rankDisplay = `<span class="rank-icon-2">🥈</span>`;
